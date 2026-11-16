@@ -214,3 +214,15 @@ docker save frontend:v1 backend:v1 emotion:v1 llm:v1 asr:v1 tts:v1 \
 ```
 
 新设备使用第 2 节的 `docker load` 导入，并另外迁移代码、模型和需要保留的运行数据。
+
+## 使用模型
+
+以下为本项目使用的模型的原始工作。
+
+
+| 模型                                | 论文                                                                                                                                     |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Qwen3-ASR、Qwen3-ForcedAligner-0.6B | Shi et al. (2026).[Qwen3-ASR Technical Report](https://arxiv.org/abs/2601.21337)                                                         |
+| Qwen3-1.7B                          | Qwen Team (2025).[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)                                                              |
+| CosyVoice3                          | Du et al. (2025).[CosyVoice 3: Towards In-the-wild Speech Generation via Scaling-up and Post-training](https://arxiv.org/abs/2505.17589) |
+| emotion2vec_plus_large              | Ma et al. (2023).[emotion2vec: Self-Supervised Pre-Training for Speech Emotion Representation](https://arxiv.org/abs/2312.15185)         |
