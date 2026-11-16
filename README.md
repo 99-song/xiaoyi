@@ -104,14 +104,15 @@ docker compose logs -f --tail=100 backend asr llm tts emotion
 
 等待模型加载完成，日志出现 `Application startup complete`。按 `Ctrl+C` 仅退出日志查看，不会停止容器。
 
-| 服务 | 默认端口 | 接口 / 页面 |
-| --- | ---: | --- |
-| 前端 | 8009 | `http://服务器IP:8009/` |
-| 业务后端 | 8004 | `/docs`、`/auth/*`、`/chat`、`/admin/*` |
-| ASR | 8000 | `/health`、`/transcribe` |
-| LLM | 8001 | `/chat` |
-| TTS | 8002 | `/zero_shot`、`/cross_lingual`、`/instruct` |
-| 情感识别 | 8003 | `/analyze` |
+
+| 服务     | 默认端口 | 接口 / 页面                                 |
+| -------- | -------: | ------------------------------------------- |
+| 前端     |     8009 | `http://服务器IP:8009/`                     |
+| 业务后端 |     8004 | `/docs`、`/auth/*`、`/chat`、`/admin/*`     |
+| ASR      |     8000 | `/health`、`/transcribe`                    |
+| LLM      |     8001 | `/chat`                                     |
+| TTS      |     8002 | `/zero_shot`、`/cross_lingual`、`/instruct` |
+| 情感识别 |     8003 | `/analyze`                                  |
 
 各 Python 服务的 Swagger 文档地址为 `http://服务器IP:对应端口/docs`，请求字段以该页面为准。
 
@@ -175,16 +176,17 @@ unset USER_TOKEN
 
 ### 常见故障
 
-| 现象 | 检查位置 |
-| --- | --- |
-| 页面可打开，登录失败 | 前端后端地址、`BACKEND_PORT`、FRP 映射和后端日志 |
-| API 返回 401 | 重新登录获取 Token；默认无操作 5 分钟过期 |
-| 无法录音 | HTTPS、浏览器麦克风权限 |
-| 模型调用失败 | `api.host`、端口连通性、对应服务日志 |
-| CUDA 显存不足 | `nvidia-smi`、GPU 分配和其他进程占用 |
-| TTS 找不到 `server.py` | 根 Compose 是否挂载 `./tts:/workspace/CosyVoice` |
-| 模型文件不存在 | 模型目录层级及 Compose 挂载 |
-| CUDA / ONNX 库缺失 | 镜像中的 CUDA、cuDNN、ONNX Runtime 依赖是否匹配 |
+
+| 现象                  | 检查位置                                         |
+| --------------------- | ------------------------------------------------ |
+| 页面可打开，登录失败  | 前端后端地址、`BACKEND_PORT`、FRP 映射和后端日志 |
+| API 返回 401          | 重新登录获取 Token；默认无操作 5 分钟过期        |
+| 无法录音              | HTTPS、浏览器麦克风权限                          |
+| 模型调用失败          | `api.host`、端口连通性、对应服务日志             |
+| CUDA 显存不足         | `nvidia-smi`、GPU 分配和其他进程占用             |
+| TTS 找不到`server.py` | 根 Compose 是否挂载`./tts:/workspace/CosyVoice`  |
+| 模型文件不存在        | 模型目录层级及 Compose 挂载                      |
+| CUDA / ONNX 库缺失    | 镜像中的 CUDA、cuDNN、ONNX Runtime 依赖是否匹配  |
 
 ## 6. 更新、备份和迁移
 
@@ -218,5 +220,3 @@ docker save frontend:v1 backend:v1 emotion:v1 llm:v1 asr:v1 tts:v1 \
 FRP 可将内网前端 `8009` 映射至云服务器 `8009`，将内网后端 `8004` 映射至云服务器 `8008`。云服务器容器端口映射、安全组和防火墙也需放行对应入口；前端使用的后端端口须与映射一致。
 
 使用域名时，将 DNS 指向云服务器，并在云端配置 HTTPS 反向代理；前端后端地址也需配合代理路径调整。模型服务端口仅供内网调用。
-
-公开代码前排除数据库、用户音频、参考音色、日志、SSL 私钥、真实密码和 Token，并检查 Git 历史。本文保留的 `Songsongme` 是公开下载资源的发布者标识，可关联其公开主页；如需匿名发布，应更换资源托管地址。镜像内是否包含凭据或个人数据，需要单独审查。
