@@ -1,5 +1,14 @@
 # AI 心灵引航员
 
+官方 ModelScope 模型页面：
+
+- Qwen3-ASR：[1.7B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B)、[0.6B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-0.6B)（按实际部署版本选择）。
+- [Qwen3-ForcedAligner-0.6B](https://www.modelscope.cn/models/Qwen/Qwen3-ForcedAligner-0.6B)
+- [Qwen3-1.7B](https://www.modelscope.cn/models/Qwen/Qwen3-1.7B)
+- [Fun-CosyVoice3-0.5B-2512](https://www.modelscope.cn/models/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)
+- [emotion2vec_plus_large](https://www.modelscope.cn/models/iic/emotion2vec_plus_large)
+- [SenseVoiceSmall](https://www.modelscope.cn/models/iic/SenseVoiceSmall)（备用模型）
+
 ## 界面预览
 
 ![前端界面示例 1](sample/1.png)
