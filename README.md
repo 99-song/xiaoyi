@@ -35,6 +35,8 @@ df -h
 
 模型下载页面：[Songsongme/xiaoyi](https://www.modelscope.cn/datasets/Songsongme/xiaoyi)。
 
+Docker 镜像资源：[Songsongme/xiaoxi_images](https://www.modelscope.cn/datasets/Songsongme/xiaoxi_images)。
+
 ```bash
 python -m pip install -U modelscope
 mkdir -p ../xiaoyi_migration/models ../xiaoyi_migration/images model
