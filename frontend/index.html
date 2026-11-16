@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 心灵引航员</title>
+<link rel="icon" href="data:;base64,=">
+<style>
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --user-bg: #6366f1;
+    --ai-bg: rgba(255,255,255,0.75);
+    --danger: #ef4444;
+    --bg1: #d9afd9;
+    --bg2: #97d9e1;
+    --text: #1e293b;
+    --muted: #64748b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+    background-size: 400% 400%;
+    animation: bgMove 15s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+button,input,select,textarea { font-family:inherit; }
+
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg,var(--bg1),var(--bg2));
+}
+.auth-card {
+    width: min(400px, calc(100vw - 40px));
+    padding: 32px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.82);
+    box-shadow: 0 20px 50px rgba(0,0,0,.15);
+}
+.auth-card h2 { color: var(--text); margin-bottom: 20px; text-align: center; }
+.auth-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 22px;
+}
+.auth-brand img {
+    width: 82px;
+    height: 82px;
+    object-fit: cover;
+    border-radius: 22px;
+    background: white;
+    box-shadow: 0 10px 24px rgba(15,23,42,.14);
+}
+.auth-brand h1 {
+    margin-top: 14px;
+    color: var(--text);
+    font-size: 24px;
+    letter-spacing: 1px;
+}
+.auth-brand p {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+}
+.auth-card input {
+    width: 100%; padding: 12px 14px; margin-bottom: 12px;
+    border: 1px solid #cbd5e1; border-radius: 12px; font-size: 15px;
+}
+.auth-card button {
+    width: 100%; padding: 12px; border: 0; border-radius: 12px;
+    background: var(--primary); color: white; font-weight: bold; cursor: pointer;
+}
+.auth-switch { margin-top: 14px; text-align: center; color: var(--primary-dark); cursor: pointer; }
+.auth-error { min-height: 22px; margin-bottom: 10px; color: var(--danger); text-align: center; }
+.logout-btn {
+    border: 0; border-radius: 10px; padding: 8px 12px; cursor: pointer;
+    color: white; background: var(--danger);
+}
+.mobile-menu-btn,
+.mobile-backdrop { display: none; }
+.admin-panel {
+    width: min(1200px, calc(100vw - 40px)); min-height: 70vh; padding: 28px;
+    border-radius: 24px; background: rgba(255,255,255,.82);
+    box-shadow: 0 20px 50px rgba(0,0,0,.15);
+}
+.admin-toolbar { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+.admin-toolbar h2 { margin-right:auto; color:var(--text); }
+.user-table { width:100%; border-collapse:collapse; background:white; border-radius:14px; overflow:hidden; }
+.user-table th,.user-table td { padding:13px; text-align:left; border-bottom:1px solid #e2e8f0; }
+.editable-username { color:var(--primary); cursor:pointer; font-weight:600; }
+.editable-username:hover { text-decoration:underline; }
+.username-inline-input { width:150px; padding:7px 9px; border:1px solid var(--primary); border-radius:8px; outline:none; }
+.user-actions button { margin-right:8px; padding:7px 10px; border:0; border-radius:8px; cursor:pointer; }
+.admin-table-wrap { overflow-x:auto; border-radius:14px; }
+.role-select { min-width:130px; padding:7px 9px; border:1px solid #cbd5e1; border-radius:8px; background:white; }
+.prompt-modal {
+    position:fixed; inset:0; z-index:1500; display:none; align-items:center; justify-content:center;
+    padding:20px; background:rgba(15,23,42,.55);
+}
+.prompt-modal.open { display:flex; }
+.prompt-card {
+    width:min(860px, 100%); max-height:90vh; overflow:auto; padding:24px;
+    border-radius:20px; background:#fff; box-shadow:0 24px 60px rgba(0,0,0,.25);
+}
+.prompt-card h3 { margin-bottom:16px; color:var(--text); }
+.prompt-tabs { display:flex; gap:8px; margin-bottom:16px; padding:5px; border-radius:12px; background:#f1f5f9; }
+.prompt-tab { flex:1; padding:10px 12px; border:0; border-radius:9px; background:transparent; color:#475569; cursor:pointer; font-weight:600; }
+.prompt-tab.active { color:white; background:var(--primary); box-shadow:0 4px 12px rgba(59,130,246,.25); }
+.prompt-sections { display:block; }
+.prompt-section { display:none; padding:18px; border:1px solid #e2e8f0; border-radius:14px; background:#f8fafc; }
+.prompt-section.active { display:block; }
+.prompt-section h4 { margin:0 0 6px; color:var(--text); }
+.prompt-section-description { min-height:38px; margin:0 0 12px; color:var(--muted); font-size:13px; }
+.prompt-name-field { width:100%; margin-bottom:12px; padding:10px; border:1px solid #cbd5e1; border-radius:10px; }
+.prompt-name-field[readonly] { color:#64748b; background:#e2e8f0; }
+.prompt-generator { margin:0 0 12px; padding:12px; border:1px dashed #93c5fd; border-radius:12px; background:#eff6ff; }
+.prompt-generator-row { display:flex; gap:8px; }
+.prompt-generator input[type="text"] { flex:1; min-width:0; padding:10px; border:1px solid #bfdbfe; border-radius:9px; }
+.prompt-generator button { padding:9px 12px; border:0; border-radius:9px; cursor:pointer; }
+.prompt-generator-option { display:flex; align-items:center; gap:6px; margin-top:8px; color:#475569; font-size:13px; }
+.prompt-card textarea.prompt-generated-output { min-height:150px; margin-top:10px; background:white; border-color:#bfdbfe; }
+.prompt-generated-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:8px; }
+.voice-fields { display:grid; grid-template-columns:220px 1fr; gap:10px; margin-bottom:10px; }
+.voice-fields input { width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:10px; }
+.voice-audio-controls { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.voice-audio-controls input[type="file"] { flex:1; min-width:220px; }
+.voice-preview { display:flex; align-items:center; gap:10px; margin-top:12px; padding:10px; border-radius:10px; background:white; }
+.voice-preview audio { flex:1; min-width:180px; height:38px; }
+.voice-preview button { padding:9px 12px; border:0; border-radius:9px; cursor:pointer; }
+.voice-recording { color:#dc2626; font-weight:600; }
+.prompt-controls { display:flex; gap:8px; margin-bottom:12px; }
+.prompt-controls select { flex:1; padding:10px; border:1px solid #cbd5e1; border-radius:10px; }
+.prompt-controls button,.prompt-actions button { padding:9px 12px; border:0; border-radius:9px; cursor:pointer; }
+.prompt-card textarea {
+    width:100%; min-height:320px; resize:vertical; padding:14px; border:1px solid #cbd5e1;
+    border-radius:12px; line-height:1.6; font:14px/1.6 inherit;
+}
+.prompt-help { margin:10px 0; color:var(--muted); font-size:13px; }
+.prompt-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:14px; }
+.prompt-card button {
+    font-family:inherit; font-size:14px; font-weight:600; line-height:1.2;
+    color:#334155; background:#e2e8f0; transition:background .18s ease, opacity .18s ease;
+}
+.prompt-card button:hover:not(:disabled) { background:#cbd5e1; }
+.prompt-card button:disabled { opacity:.5; cursor:not-allowed; }
+.prompt-card .prompt-primary,.prompt-card .prompt-save { color:white; background:var(--primary); }
+.prompt-card .prompt-primary:hover:not(:disabled),.prompt-card .prompt-save:hover:not(:disabled) { background:var(--primary-dark); }
+.prompt-card .delete-btn { color:white; background:var(--danger); }
+.prompt-card .delete-btn:hover:not(:disabled) { background:#dc2626; }
+
+@media (max-width: 760px) {
+    .prompt-tabs { overflow-x:auto; }
+    .prompt-tab { min-width:110px; white-space:nowrap; }
+    .voice-fields { grid-template-columns:1fr; }
+    .voice-preview { align-items:stretch; flex-direction:column; }
+    .voice-preview audio { width:100%; }
+    .prompt-generator-row { flex-direction:column; }
+    .prompt-section-description { min-height:auto; }
+    .admin-panel { width:100%; min-height:100dvh; padding:14px 10px; border-radius:0; }
+    .admin-toolbar { align-items:stretch; gap:8px; }
+    .admin-toolbar h2 { width:100%; margin:0; font-size:20px; }
+    .admin-toolbar span { width:100%; color:var(--muted); font-size:13px; }
+    .admin-toolbar button { flex:1; min-height:40px; padding:8px 10px; }
+    .admin-table-wrap { overflow:visible; }
+    .user-table,.user-table tbody { display:block; background:transparent; }
+    .user-table thead { display:none; }
+    .user-table tr {
+        display:block; margin-bottom:12px; padding:8px 12px;
+        border:1px solid #e2e8f0; border-radius:14px; background:white;
+        box-shadow:0 4px 12px rgba(15,23,42,.06);
+    }
+    .user-table td {
+        display:flex; align-items:center; justify-content:space-between; gap:12px;
+        min-height:44px; padding:9px 2px; border-bottom:1px solid #eef2f7;
+        text-align:right;
+    }
+    .user-table td:last-child { border-bottom:0; }
+    .user-table td::before {
+        content:attr(data-label); flex:0 0 88px; color:var(--muted);
+        font-size:13px; font-weight:600; text-align:left;
+    }
+    .user-table .role-select { width:min(210px, 62vw); min-width:0; }
+    .user-table .editable-username { justify-content:space-between; }
+    .username-inline-input { width:min(210px, 62vw); }
+    .user-actions { justify-content:flex-end !important; flex-wrap:wrap; }
+    .user-actions button { margin:0; }
+    .prompt-modal { align-items:flex-end; padding:0; }
+    .prompt-card { width:100%; max-height:94dvh; border-radius:18px 18px 0 0; }
+    .prompt-controls { flex-wrap:wrap; }
+    .prompt-controls select { flex:1 0 100%; width:100%; }
+    .voice-audio-controls { align-items:stretch; flex-direction:column; }
+    .voice-audio-controls input[type="file"] { width:100%; min-width:0; }
+}
+
+@keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.app {
+    flex:1;
+    height: 90vh;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(18px);
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+}
+
+.layout{
+    width:100%;
+    max-width:1400px;
+    height:90vh;
+    display:flex;
+    gap:20px;
+}
+
+/* 左侧 */
+.sidebar{
+    width:320px;
+    background:rgba(255,255,255,.18);
+    backdrop-filter:blur(18px);
+    border-radius:28px;
+    border:1px solid rgba(255,255,255,.3);
+    box-shadow:0 20px 40px rgba(0,0,0,.12);
+
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+/* header */
+.sidebar-header{
+    padding:20px;
+    border-bottom:1px solid rgba(255,255,255,.2);
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.sidebar-header h2{
+    font-size:20px;
+    color:var(--text);
+}
+
+/* 新对话按钮 */
+.new-chat-btn{
+    border:none;
+    background:var(--primary);
+    color:white;
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.new-chat-btn:hover{
+    background:var(--primary-dark);
+}
+
+.delete-btn{
+    border:none;
+    background:#ef4444;
+    color:white;
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.delete-btn:hover{
+    background:#dc2626;
+}
+
+/* session list */
+.session-list{
+    flex:1;
+    overflow-y:auto;
+    padding:12px;
+}
+
+/* session item */
+.session-item{
+    padding:14px;
+    border-radius:16px;
+    margin-bottom:10px;
+
+    background:rgba(255,255,255,.35);
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.session-item:hover{
+    background:rgba(255,255,255,.6);
+    transform:translateY(-2px);
+}
+
+.session-item.active{
+    border:2px solid var(--primary);
+    background:rgba(255,255,255,.8);
+}
+
+.session-title{
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.session-time{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+}
+
+
+/* ===== 顶部 ===== */
+.header {
+    padding: 16px;
+    background: rgba(255,255,255,0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    
+    /* 新增：开启弹性盒子布局，实现左右排列 */
+    display: flex;
+    align-items: center;       /* 让图片和文字垂直居中对齐 */
+    justify-content: center;   /* 让整体在头部水平居中 */
+    gap: 14px;                 /* 图片和文字之间的间距 */
+}
+
+.logo {
+    width: 50px;  /* 稍微改小一点，配合左右布局更精致 */
+    height: 50px;
+    flex-shrink: 0; /* 防止屏幕变窄时图片被挤压变形 */
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background: white; 
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 新增：专门控制文字区域的对齐方式 */
+.header-text {
+    text-align: left; /* 文字靠左排列 */
+}
+
+.header-text h1 {
+    font-size: 18px;
+    color: var(--text);
+    margin: 0; /* 清除默认外边距 */
+}
+
+.header-text p {
+    margin-top: 4px; 
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 0;
+}
+
+
+/* ===== 会话区域 ===== */
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.chat-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 20px;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn .35s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message.user {
+    align-items: flex-end;
+}
+
+.message.ai {
+    align-items: flex-start;
+}
+
+.bubble {
+    max-width: 85%;
+    padding: 14px 16px;
+    border-radius: 18px;
+    line-height: 1.6;
+    font-size: 15px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.user .bubble {
+    background: var(--user-bg);
+    color: white;
+    border-bottom-right-radius: 6px;
+}
+
+.ai .bubble {
+    background: var(--ai-bg);
+    color: var(--text);
+    border-bottom-left-radius: 6px;
+}
+
+.time {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.emotion-tag {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 2px 7px 2px 3px;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.15); /* 使用你的主题色带透明度 */
+    color: var(--primary-dark);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.emotion-emoji {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* ===== 输入区域 ===== */
+.footer {
+    padding: 18px;
+    background: rgba(255,255,255,0.25);
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+/* 调整了 session 区域，增加并排按钮 */
+.session-box {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+}
+
+.session-input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,.8);
+    font-size: 14px;
+    transition: box-shadow 0.3s;
+}
+.session-input:focus {
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.load-btn {
+    padding: 0 16px;
+    border-radius: 14px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.load-btn:hover {
+    background: var(--primary-dark);
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.record-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(145deg,#ffffff,#f0f0f0);
+    box-shadow: 8px 8px 16px rgba(0,0,0,.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .25s ease;
+    position: relative;
+    touch-action: none;
+    user-select: none;
+}
+
+.record-btn svg {
+    width: 34px;
+    fill: var(--text);
+}
+
+.record-btn:active {
+    transform: scale(.92);
+}
+
+.record-btn.recording {
+    background: var(--danger);
+    animation: pulse 1.2s infinite;
+}
+
+.record-btn.recording svg {
+    fill: white;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,.7); }
+    70% { box-shadow: 0 0 0 28px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
+
+.wave {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+}
+
+.wave span {
+    width: 4px;
+    border-radius: 4px;
+    background: var(--danger);
+    animation: wave .8s infinite ease-in-out;
+}
+
+.wave span:nth-child(1){animation-delay:0s}
+.wave span:nth-child(2){animation-delay:.1s}
+.wave span:nth-child(3){animation-delay:.2s}
+.wave span:nth-child(4){animation-delay:.3s}
+.wave span:nth-child(5){animation-delay:.4s}
+
+@keyframes wave {
+    0%,100%{height:8px}
+    50%{height:30px}
+}
+
+.status {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.typing {
+    display: flex;
+    gap: 5px;
+    padding: 10px 14px;
+}
+
+.typing span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #94a3b8;
+    animation: typing .8s infinite;
+}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+
+@keyframes typing {
+    0%,100%{ transform: translateY(0); opacity: .4; }
+    50%{ transform: translateY(-5px); opacity: 1; }
+}
+
+.audio-player {
+    margin-top: 10px;
+    width: 220px;
+    height: 36px;
+    outline: none;
+}
+
+@media(max-width:700px){
+    body {
+        display: flex;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    .layout {
+        width: 100%;
+        height: 100dvh;
+        display: block;
+        gap: 0;
+    }
+    .sidebar {
+        position: fixed;
+        z-index: 1200;
+        inset: 0 auto 0 0;
+        width: min(86vw, 360px);
+        height: 100dvh;
+        min-height: 0;
+        border-radius: 0;
+        background: rgba(241,245,249,.97);
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .mobile-backdrop {
+        position: fixed;
+        z-index: 1100;
+        inset: 0;
+        background: rgba(15,23,42,.45);
+    }
+    .mobile-backdrop.open {
+        display: block;
+    }
+    .mobile-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        border: 0;
+        border-radius: 10px;
+        padding: 8px 10px;
+        color: white;
+        background: var(--primary);
+        font-weight: 600;
+    }
+    .sidebar-header {
+        padding: 16px 12px;
+    }
+    .sidebar-header h2 {
+        font-size: 17px;
+    }
+    .sidebar-header > div {
+        gap: 6px !important;
+    }
+    .new-chat-btn,
+    .delete-btn {
+        padding: 9px 10px;
+    }
+    .app{
+        width: 100%;
+        height:100dvh;
+        min-height:100dvh;
+        flex:none;
+        border-radius:0;
+    }
+    .header {
+        min-height: 68px;
+        padding: 9px 10px;
+        justify-content: flex-start;
+        gap: 9px;
+    }
+    .logo { width: 40px; height: 40px; border-radius: 10px; }
+    .header-text { flex: 1; min-width: 0; }
+    .header-text h1 { font-size: 16px; white-space: nowrap; }
+    .header-text p { display: none; }
+    .user-menu { margin-left: 0 !important; gap: 6px !important; }
+    #currentUsername { display: none; }
+    .logout-btn { padding: 7px 9px; }
+    .chat-area { padding: 14px 12px; gap: 13px; }
+    .bubble { max-width: 92%; padding: 11px 13px; }
+    .emotion-tag { margin-left: 5px; line-height: 18px; }
+    .emotion-emoji { width: 18px; height: 18px; flex-basis: 18px; }
+    .footer { padding: 12px; }
+    .record-btn { width: 72px; height: 72px; }
+    .record-btn svg { width: 29px; }
+    .auth-card { padding: 26px 22px; }
+    .auth-brand img { width: 70px; height: 70px; border-radius: 18px; }
+    .auth-brand h1 { font-size: 21px; }
+    .admin-panel { width:100%; min-height:100dvh; padding:16px 10px; border-radius:0; }
+    .admin-toolbar { flex-wrap:wrap; }
+    .admin-toolbar h2 { width:100%; }
+    .prompt-card { padding:16px; }
+    .prompt-section { padding:14px; }
+    .prompt-card textarea { min-height:220px; }
+}
+</style>
+</head>
+
+<body>
+<div id="mobileBackdrop" class="mobile-backdrop"></div>
+<div id="authOverlay" class="auth-overlay">
+    <form id="authForm" class="auth-card">
+        <div class="auth-brand">
+            <img src="logo.png" alt="AI 心灵引航员图标">
+            <h1>AI 心灵引航员</h1>
+            <p>倾听你的情绪，回应你的内心</p>
+        </div>
+        <h2 id="authTitle">用户登录</h2>
+        <input id="authUsername" autocomplete="username" placeholder="用户名" maxlength="50" required>
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="密码" maxlength="128" required>
+        <div id="authError" class="auth-error"></div>
+        <button id="authSubmit" type="submit">登录</button>
+        <div class="auth-switch" style="cursor:default;color:#64748b">新账号请联系管理员创建</div>
+    </form>
+</div>
+
+<div id="adminPanel" class="admin-panel" style="display:none">
+    <div class="admin-toolbar">
+        <h2>用户管理</h2>
+        <span>管理员：<strong id="adminUsername"></strong></span>
+        <button id="adminAccountBtn" class="new-chat-btn">账户设置</button>
+        <button id="adminPromptBtn" class="new-chat-btn">提示词管理</button>
+        <button id="adminCreateBtn" class="new-chat-btn">新增用户</button>
+        <button id="adminLogoutBtn" class="logout-btn">退出</button>
+    </div>
+    <div class="admin-table-wrap">
+        <table class="user-table">
+            <thead><tr><th>ID</th><th>用户名</th><th>用户角色</th><th>情绪判断</th><th>参考音色</th><th>创建时间</th><th>最近登录时间</th><th>操作</th></tr></thead>
+            <tbody id="userTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="promptModal" class="prompt-modal">
+    <div class="prompt-card">
+        <h3>提示词管理</h3>
+        <div class="prompt-tabs" role="tablist">
+            <button class="prompt-tab active" type="button" data-prompt-tab="role">角色提示词</button>
+            <button class="prompt-tab" type="button" data-prompt-tab="system">情绪判断</button>
+            <button class="prompt-tab" type="button" data-prompt-tab="voice">参考音色</button>
+        </div>
+        <div class="prompt-sections">
+            <section id="rolePromptPanel" class="prompt-section active" data-prompt-panel="role">
+                <h4>用户角色提示词</h4>
+                <p class="prompt-section-description">用于控制不同用户的回答角色，可创建角色并分配给用户。</p>
+                <div class="prompt-controls">
+                    <select id="rolePromptTypeSelect"></select>
+                    <button id="promptAddBtn" type="button">新建</button>
+                    <button id="promptDeleteBtn" type="button" class="delete-btn">删除</button>
+                </div>
+                <input id="rolePromptName" class="prompt-name-field" maxlength="50" placeholder="角色名称，例如：家庭陪伴 / family_companion" readonly>
+                <div class="prompt-generator">
+                    <div class="prompt-generator-row">
+                        <input id="roleGenerateDescription" type="text" maxlength="2000" placeholder="描述角色，例如：面向老年人的耐心心理陪伴者">
+                        <button id="roleGenerateBtn" class="prompt-primary" type="button">生成</button>
+                    </div>
+                    <textarea id="roleGeneratedOutput" class="prompt-generated-output" readonly placeholder="AI 生成结果将在这里展示，不会自动修改原正文"></textarea>
+                    <div class="prompt-generated-actions">
+                        <button id="roleGeneratedReplaceBtn" class="prompt-primary" type="button">替换正文</button>
+                    </div>
+                </div>
+                <textarea id="rolePromptContent" maxlength="10000" placeholder="请输入角色提示词"></textarea>
+                <div class="prompt-actions">
+                    <button id="rolePromptSaveBtn" type="button" class="prompt-save">保存修改</button>
+                </div>
+            </section>
+            <section id="voicePromptPanel" class="prompt-section voice-section" data-prompt-panel="voice">
+                <h4>参考音色模板</h4>
+                <p class="prompt-section-description">参考文本必须与音频内容一致。可以上传音频，也可以直接在浏览器录制。</p>
+                <div class="prompt-controls">
+                    <select id="voicePromptSelect"></select>
+                    <button id="voicePromptNewBtn" type="button">新建</button>
+                    <button id="voicePromptDeleteBtn" type="button" class="delete-btn">删除</button>
+                </div>
+                <div class="voice-fields">
+                    <input id="voicePromptName" maxlength="100" placeholder="音色名称">
+                    <input id="voicePromptText" maxlength="1000" placeholder="请输入音频中实际朗读的文本">
+                </div>
+                <div class="voice-audio-controls">
+                    <label for="voicePromptFile">上传音频</label>
+                    <input id="voicePromptFile" type="file" accept=".wav,.mp3,.m4a,.aac,.flac,.ogg,.webm,.mp4,audio/*">
+                    <button id="voicePromptRecordBtn" type="button">开始录制</button>
+                    <button id="voicePromptAsrBtn" class="prompt-primary" type="button">识别</button>
+                    <span id="voicePromptRecordStatus">未选择新音频</span>
+                </div>
+                <div class="prompt-help">支持 WAV、MP3、M4A、AAC、FLAC、OGG、WebM、MP4；上传后自动转为 16kHz 单声道 WAV，并裁剪首尾静音。</div>
+                <textarea id="voiceAsrOutput" class="prompt-generated-output" readonly placeholder="ASR 识别结果将在这里展示，不会自动修改参考文本"></textarea>
+                <div class="prompt-generated-actions">
+                    <button id="voiceAsrReplaceBtn" class="prompt-primary" type="button">替换参考文本</button>
+                </div>
+                <div class="voice-preview">
+                    <audio id="voicePromptPreview" controls preload="metadata"></audio>
+                    <button id="voicePromptDownloadBtn" type="button">下载</button>
+                </div>
+                <div class="prompt-actions">
+                    <button id="voicePromptSaveBtn" type="button" class="prompt-save">保存音色</button>
+                </div>
+            </section>
+            <section id="systemPromptPanel" class="prompt-section" data-prompt-panel="system">
+                <h4>情绪判断提示词</h4>
+                <p class="prompt-section-description">用于情绪判断，可由管理员为不同用户独立分配。</p>
+                <div class="prompt-controls">
+                    <select id="systemPromptTypeSelect"></select>
+                    <button id="systemPromptAddBtn" type="button">新建</button>
+                    <button id="systemPromptDeleteBtn" type="button" class="delete-btn">删除</button>
+                </div>
+                <input id="systemPromptName" class="prompt-name-field" maxlength="50" placeholder="模板名称，例如：温和情绪 / gentle_emotion" readonly>
+                <div class="prompt-generator">
+                    <div class="prompt-generator-row">
+                        <input id="systemGenerateDescription" type="text" maxlength="2000" placeholder="描述判断要求，例如：区分开心、难过、生气并输出对应语气">
+                        <button id="systemGenerateBtn" class="prompt-primary" type="button">生成</button>
+                    </div>
+                    <textarea id="systemGeneratedOutput" class="prompt-generated-output" readonly placeholder="AI 生成结果将在这里展示，不会自动修改原正文"></textarea>
+                    <div class="prompt-generated-actions">
+                        <button id="systemGeneratedReplaceBtn" class="prompt-primary" type="button">替换正文</button>
+                    </div>
+                </div>
+                <textarea id="systemPromptContent" maxlength="10000" placeholder="请输入情绪判断提示词"></textarea>
+                <div class="prompt-actions">
+                    <button id="systemPromptSaveBtn" type="button" class="prompt-save">保存修改</button>
+                </div>
+            </section>
+        </div>
+        <div class="prompt-actions">
+            <button id="promptCloseBtn" type="button">关闭</button>
+        </div>
+    </div>
+</div>
+
+<div id="mainLayout" class="layout" style="display:none">
+
+    <!-- 左侧 session 栏 -->
+    <div class="sidebar">
+
+        <div class="sidebar-header">
+
+            <h2>会话记录</h2>
+
+            <div style="display:flex;gap:10px">
+
+                <button id="deleteBtn" class="delete-btn">
+                    删除
+                </button>
+
+                <button id="newChatBtn" class="new-chat-btn">
+                    + 新对话
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="sessionList" class="session-list">
+        </div>
+
+    </div>
+
+    <!-- 右侧聊天 -->
+    <div class="app">
+        
+    <div class="header">
+        <button id="mobileMenuBtn" class="mobile-menu-btn" type="button">☰ 会话</button>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+
+        <div class="header-text">
+            <h1>AI 心灵引航员</h1>
+            <p>倾听你的情绪，回应你的内心。</p>
+        </div>
+
+        <div class="user-menu" style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <span id="currentUsername"></span>
+            <button id="registerUserBtn" class="new-chat-btn" style="display:none">注册用户</button>
+            <button id="logoutBtn" class="logout-btn">退出</button>
+        </div>
+
+    </div>
+
+    <div class="chat-area" id="chatArea">
+        <div class="message ai">
+            <div class="bubble">你好，我一直都在。你可以点击下方按钮对我说话。</div>
+            <div class="time">刚刚</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="controls">
+            <div class="wave" id="wave" style="display:none">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <button class="record-btn" id="recordBtn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a1 1 0 0 0-2 0 3 3 0 0 1-6 0 1 1 0 0 0-2 0 5 5 0 0 0 4.9 4.9V19h-3a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2h-3v-3.1A5 5 0 0 0 17 11z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="status" id="status">准备扬帆起航</div>
+    </div>
+    </div>
+</div>
+
+<script>
+// ================= 配置区域 =================
+const isInternalAccess = ['10.21.22.54', '127.0.0.1', 'localhost'].includes(window.location.hostname);
+const BACKEND_PORT = isInternalAccess ? 8004 : 8008;
+const BASE_URL = `${window.location.protocol}//${window.location.hostname}:${BACKEND_PORT}`;
+const CHAT_API_URL = `${BASE_URL}/chat`;
+const HISTORY_API_URL = `${BASE_URL}/get_session_history`;
+const HISTORY_SESSIONS_API_URL = `${BASE_URL}/get_all_sessions`;
+const DELETE_SESSIONS_API_URL = `${BASE_URL}/delete_sessions`;
+const LOGIN_API_URL = `${BASE_URL}/auth/login`;
+const ADMIN_ACCOUNT_API_URL = `${BASE_URL}/admin/account`;
+const USERS_API_URL = `${BASE_URL}/admin/users`;
+const PROMPTS_API_URL = `${BASE_URL}/admin/prompts`;
+const VOICE_PROMPTS_API_URL = `${BASE_URL}/admin/voice-prompts`;
+// ==========================================
+
+// 连续无操作达到 Token 有效期后自动退出；操作期间通过心跳保持登录。
+let accessToken = sessionStorage.getItem('xiaoyi_access_token');
+let inactivityMs = Number(sessionStorage.getItem('xiaoyi_inactivity_ms')) || 5 * 60 * 1000;
+let inactivityTimer = null;
+let keepAliveTimer = null;
+let lastActivityAt = Date.now();
+let currentAdmin = null;
+
+async function authFetch(url, options={}) {
+    const headers = new Headers(options.headers || {});
+    if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+    const response = await fetch(url, {...options, headers});
+    if (response.status === 401 && accessToken) expireSession(false);
+    return response;
+}
+
+function configureInactivityTimeout(expiresInSeconds) {
+    const seconds = Number(expiresInSeconds);
+    if (Number.isFinite(seconds) && seconds > 0) {
+        inactivityMs = seconds * 1000;
+        sessionStorage.setItem('xiaoyi_inactivity_ms', String(inactivityMs));
+    }
+    markUserActivity();
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = setInterval(async () => {
+        if (!accessToken || Date.now() - lastActivityAt >= inactivityMs) return;
+        try { await authFetch(`${BASE_URL}/auth/me`); } catch (_) {}
+    }, Math.max(15000, Math.min(60000, Math.floor(inactivityMs / 2))));
+}
+
+function markUserActivity() {
+    if (!accessToken) return;
+    lastActivityAt = Date.now();
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => expireSession(true), inactivityMs);
+}
+
+function expireSession(notifyUser=false) {
+    if (!accessToken) return;
+    const expiredToken = accessToken;
+    accessToken = null;
+    clearTimeout(inactivityTimer);
+    clearInterval(keepAliveTimer);
+    sessionStorage.removeItem('xiaoyi_access_token');
+    sessionStorage.removeItem('xiaoyi_inactivity_ms');
+    fetch(`${BASE_URL}/auth/logout`, {
+        method:'POST', headers:{'Authorization':`Bearer ${expiredToken}`}
+    }).catch(() => {});
+    showLogin();
+    if (notifyUser) document.getElementById('authError').innerText = '长时间未操作，请重新登录';
+}
+
+async function readError(response) {
+    try {
+        const data = await response.json();
+        return data.detail || data.error || `请求失败 (${response.status})`;
+    } catch (_) {
+        return `请求失败 (${response.status})`;
+    }
+}
+
+function showLogin() {
+    setMobileSidebar(false);
+    document.getElementById('mainLayout').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('promptModal').classList.remove('open');
+    document.getElementById('authOverlay').style.display = 'flex';
+}
+
+async function enterApp(user) {
+    document.getElementById('currentUsername').innerText = user.username;
+    document.getElementById('authOverlay').style.display = 'none';
+    if (user.is_admin) {
+        currentAdmin = user;
+        document.getElementById('adminUsername').innerText = user.username;
+        document.getElementById('mainLayout').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        await loadPrompts();
+        await loadVoicePrompts();
+        await loadUsers();
+        if (user.must_change_password) {
+            alert('当前使用的是系统初始密码，请立即在账户设置中修改密码。');
+            await editAdminAccount(true);
+        }
+        return;
+    }
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('registerUserBtn').style.display = 'none';
+    document.getElementById('mainLayout').style.display = 'flex';
+    await initAudio();
+    await loadSessions();
+}
+
+document.getElementById('authForm').onsubmit = async (event) => {
+    event.preventDefault();
+    const username = document.getElementById('authUsername').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const errorBox = document.getElementById('authError');
+    errorBox.innerText = '';
+    try {
+        const response = await fetch(LOGIN_API_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        if (!response.ok) {
+            errorBox.innerText = await readError(response);
+            return;
+        }
+        const data = await response.json();
+        accessToken = data.access_token;
+        sessionStorage.setItem('xiaoyi_access_token', accessToken);
+        configureInactivityTimeout(data.expires_in);
+        await enterApp(data.user);
+    } catch (error) {
+        errorBox.innerText = `无法连接后端服务：${LOGIN_API_URL}`;
+        console.error(error);
+    }
+};
+
+async function createUser() {
+    const username = prompt('请输入新用户的用户名：');
+    if (!username) return;
+    const password = prompt('请输入新用户的密码（至少 6 位）：');
+    if (!password) return;
+    const availableRoles = promptDefinitions.filter(item => item.assignable).map(item => item.type);
+    const roleType = prompt(`请选择角色（${availableRoles.join(' / ')}）：`, 'old_people');
+    if (!roleType) return;
+    if (!availableRoles.includes(roleType.trim())) {
+        alert('请选择已有的可分配角色');
+        return;
+    }
+    const availableEmotionPrompts = promptDefinitions.filter(item => item.category === 'system').map(item => item.type);
+    const emotionPromptType = prompt(`请选择情绪判断提示词（${availableEmotionPrompts.join(' / ')}）：`, 'emotion_detection');
+    if (!emotionPromptType) return;
+    if (!availableEmotionPrompts.includes(emotionPromptType.trim())) {
+        alert('请选择已有的情绪判断提示词');
+        return;
+    }
+    const availableVoices = voicePromptDefinitions.map(item => item.name);
+    const voicePromptName = prompt(`请选择参考音色（${availableVoices.join(' / ')}）：`, voicePromptDefinitions[0]?.name || '');
+    if (!voicePromptName) return;
+    const selectedVoice = voicePromptDefinitions.find(item => item.name === voicePromptName.trim());
+    if (!selectedVoice) {
+        alert('请选择已有的参考音色');
+        return;
+    }
+    const response = await authFetch(USERS_API_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            username: username.trim(),
+            password,
+            role_type: roleType.trim(),
+            emotion_prompt_type: emotionPromptType.trim(),
+            voice_prompt_id: selectedVoice.id
+        })
+    });
+    if (!response.ok) {
+        alert(await readError(response));
+        return;
+    }
+    alert(`用户 ${username.trim()} 注册成功`);
+    await loadUsers();
+}
+
+async function editAdminAccount(requirePassword=false) {
+    const oldUsername = currentAdmin?.username || '';
+    const usernameInput = prompt('请输入新的管理员用户名：', oldUsername);
+    if (usernameInput === null) return;
+    const username = usernameInput.trim();
+    if (!username) return alert('管理员用户名不能为空');
+    const password = prompt(
+        requirePassword ? '请输入新的管理员密码（至少 6 位）：' : '请输入新的管理员密码（不修改请留空）：',
+        ''
+    );
+    if (password === null) return;
+    if (requirePassword && !password) return alert('初始管理员必须设置新密码');
+    const payload = {};
+    if (username !== oldUsername) payload.username = username;
+    if (password) payload.password = password;
+    if (!Object.keys(payload).length) return;
+    const response = await authFetch(ADMIN_ACCOUNT_API_URL, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) return alert(await readError(response));
+    const data = await response.json();
+    currentAdmin = {...currentAdmin, ...data.user, is_admin:true};
+    document.getElementById('adminUsername').innerText = currentAdmin.username;
+    if (data.reauthenticate) {
+        accessToken = null;
+        clearTimeout(inactivityTimer);
+        clearInterval(keepAliveTimer);
+        sessionStorage.removeItem('xiaoyi_access_token');
+        sessionStorage.removeItem('xiaoyi_inactivity_ms');
+        showLogin();
+        document.getElementById('authUsername').value = currentAdmin.username;
+        document.getElementById('authPassword').value = '';
+        document.getElementById('authError').innerText = '账号信息已更新，请使用新密码重新登录';
+        return;
+    }
+    alert('管理员账号已更新');
+}
+
+async function loadUsers() {
+    if (promptDefinitions.length === 0) await loadPrompts();
+    const response = await authFetch(USERS_API_URL);
+    if (!response.ok) {
+        alert(await readError(response));
+        return;
+    }
+    const data = await response.json();
+    const body = document.getElementById('userTableBody');
+    body.innerHTML = '';
+    for (const user of data.users) {
+        const row = document.createElement('tr');
+        const idCell = document.createElement('td');
+        const nameCell = document.createElement('td');
+        const roleCell = document.createElement('td');
+        const emotionPromptCell = document.createElement('td');
+        const voicePromptCell = document.createElement('td');
+        const timeCell = document.createElement('td');
+        const lastLoginCell = document.createElement('td');
+        const actionCell = document.createElement('td');
+        idCell.dataset.label = 'ID';
+        nameCell.dataset.label = '用户名';
+        roleCell.dataset.label = '用户角色';
+        emotionPromptCell.dataset.label = '情绪判断';
+        voicePromptCell.dataset.label = '参考音色';
+        timeCell.dataset.label = '创建时间';
+        lastLoginCell.dataset.label = '最近登录';
+        actionCell.dataset.label = '操作';
+        idCell.innerText = user.id;
+        nameCell.innerText = user.username;
+        nameCell.className = 'editable-username';
+        nameCell.title = '点击修改用户名';
+        nameCell.onclick = () => startUsernameEdit(nameCell, user);
+        const roleSelect = document.createElement('select');
+        roleSelect.className = 'role-select';
+        for (const promptItem of promptDefinitions.filter(item => item.assignable)) {
+            const option = document.createElement('option');
+            option.value = promptItem.type;
+            option.innerText = promptItem.type;
+            option.selected = promptItem.type === user.role_type;
+            roleSelect.appendChild(option);
+        }
+        roleSelect.onchange = async () => {
+            const response = await authFetch(`${USERS_API_URL}/${user.id}/role`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({role_type: roleSelect.value})
+            });
+            if (!response.ok) {
+                alert(await readError(response));
+                roleSelect.value = user.role_type;
+                return;
+            }
+            user.role_type = roleSelect.value;
+        };
+        roleCell.appendChild(roleSelect);
+        const emotionPromptSelect = document.createElement('select');
+        emotionPromptSelect.className = 'role-select';
+        for (const promptItem of promptDefinitions.filter(item => item.category === 'system')) {
+            const option = document.createElement('option');
+            option.value = promptItem.type;
+            option.innerText = promptItem.type;
+            option.selected = promptItem.type === user.emotion_prompt_type;
+            emotionPromptSelect.appendChild(option);
+        }
+        emotionPromptSelect.onchange = async () => {
+            const response = await authFetch(`${USERS_API_URL}/${user.id}/emotion-prompt`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({emotion_prompt_type: emotionPromptSelect.value})
+            });
+            if (!response.ok) {
+                alert(await readError(response));
+                emotionPromptSelect.value = user.emotion_prompt_type;
+                return;
+            }
+            user.emotion_prompt_type = emotionPromptSelect.value;
+        };
+        emotionPromptCell.appendChild(emotionPromptSelect);
+        const voicePromptSelect = document.createElement('select');
+        voicePromptSelect.className = 'role-select';
+        for (const voicePrompt of voicePromptDefinitions) {
+            const option = document.createElement('option');
+            option.value = voicePrompt.id;
+            option.innerText = voicePrompt.name;
+            option.selected = voicePrompt.id === user.voice_prompt_id;
+            voicePromptSelect.appendChild(option);
+        }
+        voicePromptSelect.onchange = async () => {
+            const response = await authFetch(`${USERS_API_URL}/${user.id}/voice-prompt`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({voice_prompt_id: Number(voicePromptSelect.value)})
+            });
+            if (!response.ok) {
+                alert(await readError(response));
+                voicePromptSelect.value = user.voice_prompt_id;
+                return;
+            }
+            user.voice_prompt_id = Number(voicePromptSelect.value);
+        };
+        voicePromptCell.appendChild(voicePromptSelect);
+        timeCell.innerText = user.created_at || '';
+        lastLoginCell.innerText = user.last_login_at || '从未登录';
+        actionCell.className = 'user-actions';
+
+        const passwordButton = document.createElement('button');
+        passwordButton.innerText = '重置密码';
+        passwordButton.onclick = () => resetUserPassword(user);
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = '删除';
+        deleteButton.style.color = '#dc2626';
+        deleteButton.onclick = () => deleteUser(user);
+        actionCell.append(passwordButton, deleteButton);
+        row.append(idCell, nameCell, roleCell, emotionPromptCell, voicePromptCell, timeCell, lastLoginCell, actionCell);
+        body.appendChild(row);
+    }
+}
+
+let promptDefinitions = [];
+let voicePromptDefinitions = [];
+let recordedVoiceBlob = null;
+let voiceRecorder = null;
+let voiceRecorderStream = null;
+let voiceRecorderChunks = [];
+let voicePreviewUrl = null;
+
+async function loadVoicePrompts(selectedId=null) {
+    const response = await authFetch(VOICE_PROMPTS_API_URL);
+    if (!response.ok) return alert(await readError(response));
+    const data = await response.json();
+    voicePromptDefinitions = data.voice_prompts || [];
+    const select = document.getElementById('voicePromptSelect');
+    const previous = selectedId || Number(select.value);
+    select.innerHTML = '';
+    for (const item of voicePromptDefinitions) {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.innerText = item.name;
+        select.appendChild(option);
+    }
+    if (voicePromptDefinitions.some(item => item.id === previous)) select.value = previous;
+    showSelectedVoicePrompt();
+}
+
+function showSelectedVoicePrompt() {
+    const id = Number(document.getElementById('voicePromptSelect').value);
+    const item = voicePromptDefinitions.find(promptItem => promptItem.id === id);
+    document.getElementById('voicePromptName').value = item?.name || '';
+    document.getElementById('voicePromptText').value = item?.text || '';
+    document.getElementById('voicePromptDeleteBtn').disabled = !id || voicePromptDefinitions.length <= 1;
+    resetVoiceAudioInput();
+    loadVoicePromptAudio(id);
+}
+
+async function loadVoicePromptAudio(id) {
+    const player = document.getElementById('voicePromptPreview');
+    if (voicePreviewUrl) {
+        URL.revokeObjectURL(voicePreviewUrl);
+        voicePreviewUrl = null;
+    }
+    player.removeAttribute('src');
+    player.load();
+    if (!id) return;
+    const response = await authFetch(`${VOICE_PROMPTS_API_URL}/${id}/audio`);
+    if (!response.ok) return;
+    voicePreviewUrl = URL.createObjectURL(await response.blob());
+    player.src = voicePreviewUrl;
+}
+
+async function downloadVoicePromptAudio() {
+    const id = Number(document.getElementById('voicePromptSelect').value);
+    const item = voicePromptDefinitions.find(promptItem => promptItem.id === id);
+    if (!item) return alert('请先选择音色模板');
+    const response = await authFetch(`${VOICE_PROMPTS_API_URL}/${id}/audio?download=true`);
+    if (!response.ok) return alert(await readError(response));
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${item.name}.wav`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function resetVoiceAudioInput() {
+    recordedVoiceBlob = null;
+    document.getElementById('voicePromptFile').value = '';
+    document.getElementById('voiceAsrOutput').value = '';
+    document.getElementById('voicePromptRecordStatus').innerText = '未选择新音频';
+    document.getElementById('voicePromptRecordStatus').classList.remove('voice-recording');
+}
+
+function newVoicePrompt() {
+    document.getElementById('voicePromptSelect').value = '';
+    document.getElementById('voicePromptName').value = '';
+    document.getElementById('voicePromptText').value = '';
+    document.getElementById('voicePromptDeleteBtn').disabled = true;
+    resetVoiceAudioInput();
+    loadVoicePromptAudio(null);
+    document.getElementById('voicePromptName').focus();
+}
+
+async function toggleVoiceRecording() {
+    const button = document.getElementById('voicePromptRecordBtn');
+    const status = document.getElementById('voicePromptRecordStatus');
+    if (voiceRecorder?.state === 'recording') {
+        voiceRecorder.stop();
+        voiceRecorderStream?.getTracks().forEach(track => track.stop());
+        button.innerText = '开始录制';
+        return;
+    }
+    try {
+        voiceRecorderStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        voiceRecorderChunks = [];
+        voiceRecorder = new MediaRecorder(voiceRecorderStream);
+        voiceRecorder.ondataavailable = event => { if (event.data.size) voiceRecorderChunks.push(event.data); };
+        voiceRecorder.onstop = () => {
+            recordedVoiceBlob = new Blob(voiceRecorderChunks, {type: voiceRecorder.mimeType || 'audio/webm'});
+            document.getElementById('voicePromptFile').value = '';
+            document.getElementById('voiceAsrOutput').value = '';
+            status.innerText = `录音完成（${Math.ceil(recordedVoiceBlob.size / 1024)} KB）`;
+            status.classList.remove('voice-recording');
+        };
+        voiceRecorder.start();
+        button.innerText = '停止录制';
+        status.innerText = '正在录制…请朗读参考文本';
+        status.classList.add('voice-recording');
+    } catch (error) {
+        alert('无法使用麦克风，请检查浏览器权限和 HTTPS 设置');
+    }
+}
+
+async function saveVoicePrompt() {
+    const id = Number(document.getElementById('voicePromptSelect').value);
+    const name = document.getElementById('voicePromptName').value.trim();
+    const text = document.getElementById('voicePromptText').value.trim();
+    const uploadedFile = document.getElementById('voicePromptFile').files[0];
+    const audio = recordedVoiceBlob || uploadedFile;
+    if (!name || !text) return alert('音色名称和参考文本不能为空');
+    if (!id && !audio) return alert('新建音色必须上传或录制音频');
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('text', text);
+    if (audio) formData.append('audio', audio, recordedVoiceBlob ? 'recording.webm' : uploadedFile.name);
+    const response = await authFetch(id ? `${VOICE_PROMPTS_API_URL}/${id}` : VOICE_PROMPTS_API_URL, {
+        method: id ? 'PUT' : 'POST', body: formData
+    });
+    if (!response.ok) return alert(await readError(response));
+    const data = await response.json();
+    await loadVoicePrompts(data.voice_prompt.id);
+    await loadUsers();
+    alert('音色模板已保存');
+}
+
+async function deleteVoicePrompt() {
+    const id = Number(document.getElementById('voicePromptSelect').value);
+    if (!confirm('确定删除该音色模板？')) return;
+    const response = await authFetch(`${VOICE_PROMPTS_API_URL}/${id}`, {method:'DELETE'});
+    if (!response.ok) return alert(await readError(response));
+    await loadVoicePrompts();
+    await loadUsers();
+}
+
+async function transcribeVoicePrompt() {
+    if (voiceRecorder?.state === 'recording') return alert('请先停止录音');
+    const uploadedFile = document.getElementById('voicePromptFile').files[0];
+    const audio = recordedVoiceBlob || uploadedFile;
+    if (!audio) return alert('请先上传音频或完成录制');
+    const outputInput = document.getElementById('voiceAsrOutput');
+    const button = document.getElementById('voicePromptAsrBtn');
+    button.disabled = true;
+    button.innerText = '识别中…';
+    const formData = new FormData();
+    formData.append('audio', audio, recordedVoiceBlob ? 'recording.webm' : uploadedFile.name);
+    try {
+        const response = await authFetch(`${VOICE_PROMPTS_API_URL}/transcribe`, {method:'POST', body:formData});
+        if (!response.ok) return alert(await readError(response));
+        const data = await response.json();
+        outputInput.value = data.text || '';
+    } finally {
+        button.disabled = false;
+        button.innerText = '识别';
+    }
+}
+
+function applyAsrResult() {
+    const outputInput = document.getElementById('voiceAsrOutput');
+    const textInput = document.getElementById('voicePromptText');
+    const result = outputInput.value.trim();
+    if (!result) return alert('请先进行 ASR 识别');
+    if (textInput.value.trim() && !confirm('确定用识别结果替换当前参考文本？')) return;
+    textInput.value = result;
+}
+
+async function generatePromptWithLlm(category) {
+    const isRole = category === 'role';
+    const descriptionInput = document.getElementById(isRole ? 'roleGenerateDescription' : 'systemGenerateDescription');
+    const outputInput = document.getElementById(isRole ? 'roleGeneratedOutput' : 'systemGeneratedOutput');
+    const button = document.getElementById(isRole ? 'roleGenerateBtn' : 'systemGenerateBtn');
+    const description = descriptionInput.value.trim();
+    if (!description) return alert('请先输入希望生成的角色或判断要求');
+    button.disabled = true;
+    button.innerText = '生成中…';
+    try {
+        const response = await authFetch(`${PROMPTS_API_URL}/generate`, {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({description, category})
+        });
+        if (!response.ok) return alert(await readError(response));
+        const data = await response.json();
+        const generated = String(data.content || '').trim();
+        outputInput.value = generated;
+    } finally {
+        button.disabled = false;
+        button.innerText = '生成';
+    }
+}
+
+function applyGeneratedPrompt(category) {
+    const isRole = category === 'role';
+    const outputInput = document.getElementById(isRole ? 'roleGeneratedOutput' : 'systemGeneratedOutput');
+    const contentInput = document.getElementById(isRole ? 'rolePromptContent' : 'systemPromptContent');
+    const generated = outputInput.value.trim();
+    if (!generated) return alert('请先生成提示词');
+    if (contentInput.value.trim() && !confirm('确定用生成结果替换当前正文？')) return;
+    contentInput.value = generated;
+}
+
+async function loadPrompts() {
+    const response = await authFetch(PROMPTS_API_URL);
+    if (!response.ok) {
+        alert(await readError(response));
+        return;
+    }
+    const data = await response.json();
+    promptDefinitions = data.prompts || [];
+    renderPromptSelector();
+}
+
+function renderPromptSelector(selectedType=null) {
+    const roleSelect = document.getElementById('rolePromptTypeSelect');
+    const systemSelect = document.getElementById('systemPromptTypeSelect');
+    const previousRole = selectedType || roleSelect.value;
+    const previousSystem = systemSelect.value;
+    roleSelect.innerHTML = '';
+    systemSelect.innerHTML = '';
+    for (const item of promptDefinitions.filter(promptItem => promptItem.assignable)) {
+        const option = document.createElement('option');
+        option.value = item.type;
+        option.innerText = item.type;
+        roleSelect.appendChild(option);
+    }
+    for (const item of promptDefinitions.filter(promptItem => !promptItem.assignable)) {
+        const option = document.createElement('option');
+        option.value = item.type;
+        option.innerText = item.type === 'emotion_detection' ? 'emotion_detection（情绪判断）' : item.type;
+        systemSelect.appendChild(option);
+    }
+    if (promptDefinitions.some(item => item.assignable && item.type === previousRole)) roleSelect.value = previousRole;
+    if (promptDefinitions.some(item => !item.assignable && item.type === previousSystem)) systemSelect.value = previousSystem;
+    showSelectedRolePrompt();
+    showSelectedSystemPrompt();
+}
+
+function showSelectedRolePrompt() {
+    const type = document.getElementById('rolePromptTypeSelect').value;
+    const item = promptDefinitions.find(promptItem => promptItem.category === 'role' && promptItem.type === type);
+    const nameInput = document.getElementById('rolePromptName');
+    nameInput.value = item?.type || '';
+    nameInput.readOnly = false;
+    nameInput.title = '可以直接修改名称后保存';
+    document.getElementById('rolePromptContent').value = item?.content || '';
+    document.getElementById('roleGeneratedOutput').value = '';
+    document.getElementById('promptDeleteBtn').disabled = !type || promptDefinitions.filter(promptItem => promptItem.category === 'role').length <= 1;
+}
+
+function showSelectedSystemPrompt() {
+    const type = document.getElementById('systemPromptTypeSelect').value;
+    const item = promptDefinitions.find(promptItem => promptItem.category === 'system' && promptItem.type === type);
+    const nameInput = document.getElementById('systemPromptName');
+    nameInput.value = item?.type || '';
+    nameInput.readOnly = false;
+    nameInput.title = '可以直接修改名称后保存';
+    document.getElementById('systemPromptContent').value = item?.content || '';
+    document.getElementById('systemGeneratedOutput').value = '';
+    document.getElementById('systemPromptDeleteBtn').disabled = !type || promptDefinitions.filter(promptItem => promptItem.category === 'system').length <= 1;
+}
+
+async function savePrompt(category) {
+    const isRole = category === 'role';
+    const select = document.getElementById(isRole ? 'rolePromptTypeSelect' : 'systemPromptTypeSelect');
+    const existingType = select.value;
+    const type = document.getElementById(isRole ? 'rolePromptName' : 'systemPromptName').value.trim();
+    const content = document.getElementById(isRole ? 'rolePromptContent' : 'systemPromptContent').value.trim();
+    if (!type || !content) return alert('模板标识和提示词内容不能为空');
+    const response = await authFetch(existingType ? `${PROMPTS_API_URL}/${encodeURIComponent(existingType)}` : PROMPTS_API_URL, {
+        method: existingType ? 'PUT' : 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(existingType ? {content, new_type: type, category} : {type, content, category})
+    });
+    if (!response.ok) return alert(await readError(response));
+    await loadPrompts();
+    const targetSelect = document.getElementById(isRole ? 'rolePromptTypeSelect' : 'systemPromptTypeSelect');
+    targetSelect.value = type;
+    isRole ? showSelectedRolePrompt() : showSelectedSystemPrompt();
+    await loadUsers();
+    alert(isRole ? '角色提示词已保存，新对话会立即使用' : '情绪判断提示词已保存，新请求会立即使用');
+}
+
+function addPrompt() {
+    document.getElementById('rolePromptTypeSelect').value = '';
+    const nameInput = document.getElementById('rolePromptName');
+    nameInput.value = '';
+    nameInput.readOnly = false;
+    document.getElementById('rolePromptContent').value = '';
+    document.getElementById('promptDeleteBtn').disabled = true;
+    nameInput.focus();
+}
+
+function addSystemPrompt() {
+    document.getElementById('systemPromptTypeSelect').value = '';
+    const nameInput = document.getElementById('systemPromptName');
+    nameInput.value = '';
+    nameInput.readOnly = false;
+    document.getElementById('systemPromptContent').value = '';
+    document.getElementById('systemPromptDeleteBtn').disabled = true;
+    nameInput.focus();
+}
+
+async function deletePrompt() {
+    const type = document.getElementById('rolePromptTypeSelect').value;
+    if (!confirm(`确定删除角色 ${type}？`)) return;
+    const response = await authFetch(`${PROMPTS_API_URL}/${encodeURIComponent(type)}?category=role`, {method:'DELETE'});
+    if (!response.ok) return alert(await readError(response));
+    await loadPrompts();
+    await loadUsers();
+}
+
+async function deleteSystemPrompt() {
+    const type = document.getElementById('systemPromptTypeSelect').value;
+    if (!confirm(`确定删除情绪判断模板 ${type}？`)) return;
+    const response = await authFetch(`${PROMPTS_API_URL}/${encodeURIComponent(type)}?category=system`, {method:'DELETE'});
+    if (!response.ok) return alert(await readError(response));
+    await loadPrompts();
+    await loadUsers();
+}
+
+function startUsernameEdit(cell, user) {
+    if (cell.querySelector('input')) return;
+    const oldUsername = user.username;
+    const input = document.createElement('input');
+    input.className = 'username-inline-input';
+    input.value = oldUsername;
+    input.maxLength = 50;
+    cell.innerHTML = '';
+    cell.appendChild(input);
+    input.focus();
+    input.select();
+    let cancelled = false;
+    input.onkeydown = event => {
+        if (event.key === 'Enter') input.blur();
+        if (event.key === 'Escape') {
+            cancelled = true;
+            cell.innerText = oldUsername;
+        }
+    };
+    input.onblur = async () => {
+        if (cancelled) return;
+        const username = input.value.trim();
+        if (!username || username === oldUsername) {
+            cell.innerText = oldUsername;
+            return;
+        }
+        const response = await authFetch(`${USERS_API_URL}/${user.id}`, {
+            method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username})
+        });
+        if (!response.ok) {
+            alert(await readError(response));
+            cell.innerText = oldUsername;
+            return;
+        }
+        user.username = username;
+        cell.innerText = username;
+    };
+}
+
+async function resetUserPassword(user) {
+    const password = prompt(`请输入用户 ${user.username} 的新密码：`, '');
+    if (!password) return;
+    const response = await authFetch(`${USERS_API_URL}/${user.id}`, {
+        method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({password})
+    });
+    if (!response.ok) return alert(await readError(response));
+    alert('密码已重置');
+}
+
+async function deleteUser(user) {
+    if (!confirm(`确定删除用户 ${user.username}？该用户的会话和音频也会删除。`)) return;
+    const response = await authFetch(`${USERS_API_URL}/${user.id}`, {method: 'DELETE'});
+    if (!response.ok) return alert(await readError(response));
+    await loadUsers();
+}
+
+async function logout() {
+    try { await authFetch(`${BASE_URL}/auth/logout`, {method: 'POST'}); } catch (_) {}
+    accessToken = null;
+    clearTimeout(inactivityTimer);
+    clearInterval(keepAliveTimer);
+    sessionStorage.removeItem('xiaoyi_access_token');
+    sessionStorage.removeItem('xiaoyi_inactivity_ms');
+    showLogin();
+}
+
+function switchPromptTab(tabName) {
+    document.querySelectorAll('[data-prompt-tab]').forEach(button => {
+        button.classList.toggle('active', button.dataset.promptTab === tabName);
+    });
+    document.querySelectorAll('[data-prompt-panel]').forEach(panel => {
+        panel.classList.toggle('active', panel.dataset.promptPanel === tabName);
+    });
+}
+
+document.getElementById('registerUserBtn').onclick = createUser;
+document.getElementById('adminCreateBtn').onclick = createUser;
+document.getElementById('adminAccountBtn').onclick = () => editAdminAccount(false);
+document.getElementById('adminLogoutBtn').onclick = logout;
+document.getElementById('adminPromptBtn').onclick = () => {
+    document.getElementById('promptModal').classList.add('open');
+    switchPromptTab('role');
+    renderPromptSelector();
+};
+document.querySelectorAll('[data-prompt-tab]').forEach(button => {
+    button.onclick = () => switchPromptTab(button.dataset.promptTab);
+});
+document.getElementById('rolePromptTypeSelect').onchange = showSelectedRolePrompt;
+document.getElementById('systemPromptTypeSelect').onchange = showSelectedSystemPrompt;
+document.getElementById('rolePromptSaveBtn').onclick = () => savePrompt('role');
+document.getElementById('systemPromptSaveBtn').onclick = () => savePrompt('system');
+document.getElementById('promptAddBtn').onclick = addPrompt;
+document.getElementById('promptDeleteBtn').onclick = deletePrompt;
+document.getElementById('systemPromptAddBtn').onclick = addSystemPrompt;
+document.getElementById('systemPromptDeleteBtn').onclick = deleteSystemPrompt;
+document.getElementById('voicePromptSelect').onchange = showSelectedVoicePrompt;
+document.getElementById('voicePromptNewBtn').onclick = newVoicePrompt;
+document.getElementById('voicePromptRecordBtn').onclick = toggleVoiceRecording;
+document.getElementById('voicePromptAsrBtn').onclick = transcribeVoicePrompt;
+document.getElementById('voiceAsrReplaceBtn').onclick = applyAsrResult;
+document.getElementById('voicePromptDownloadBtn').onclick = downloadVoicePromptAudio;
+document.getElementById('voicePromptSaveBtn').onclick = saveVoicePrompt;
+document.getElementById('voicePromptDeleteBtn').onclick = deleteVoicePrompt;
+document.getElementById('voicePromptFile').onchange = event => {
+    recordedVoiceBlob = null;
+    document.getElementById('voiceAsrOutput').value = '';
+    const file = event.target.files[0];
+    document.getElementById('voicePromptRecordStatus').innerText = file ? `已选择：${file.name}` : '未选择新音频';
+};
+document.getElementById('roleGenerateBtn').onclick = () => generatePromptWithLlm('role');
+document.getElementById('systemGenerateBtn').onclick = () => generatePromptWithLlm('system');
+document.getElementById('roleGeneratedReplaceBtn').onclick = () => applyGeneratedPrompt('role');
+document.getElementById('systemGeneratedReplaceBtn').onclick = () => applyGeneratedPrompt('system');
+document.getElementById('promptCloseBtn').onclick = () => document.getElementById('promptModal').classList.remove('open');
+
+document.getElementById('logoutBtn').onclick = async () => {
+    try { await authFetch(`${BASE_URL}/auth/logout`, {method: 'POST'}); } catch (_) {}
+    accessToken = null;
+    clearTimeout(inactivityTimer);
+    clearInterval(keepAliveTimer);
+    sessionStorage.removeItem('xiaoyi_access_token');
+    sessionStorage.removeItem('xiaoyi_inactivity_ms');
+    showLogin();
+};
+
+const recordBtn = document.getElementById('recordBtn');
+const statusText = document.getElementById('status');
+const chatArea = document.getElementById('chatArea');
+const wave = document.getElementById('wave');
+const sessionList = document.getElementById('sessionList');
+const newChatBtn = document.getElementById('newChatBtn');
+const sidebar = document.querySelector('.sidebar');
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileBackdrop = document.getElementById('mobileBackdrop');
+
+let currentSessionId = null;
+let currentActiveElement = null;
+
+let mediaRecorder;
+let audioChunks = [];
+let recordingStartedAt = 0;
+const MIN_RECORDING_DURATION_MS = 500;
+
+const EMOTION_EMOJI_MAP = {
+    '生气': 'emotion_emoji/0_angry.png',
+    'angry': 'emotion_emoji/0_angry.png',
+    '厌恶': 'emotion_emoji/1_disgusted.png',
+    'disgusted': 'emotion_emoji/1_disgusted.png',
+    '恐惧': 'emotion_emoji/2_fearful.png',
+    'fearful': 'emotion_emoji/2_fearful.png',
+    '开心': 'emotion_emoji/3_happy.png',
+    'happy': 'emotion_emoji/3_happy.png',
+    '中立': 'emotion_emoji/4_neutral.png',
+    'neutral': 'emotion_emoji/4_neutral.png',
+    '其他': 'emotion_emoji/5_other.png',
+    'other': 'emotion_emoji/5_other.png',
+    '难过': 'emotion_emoji/6_sad.png',
+    'sad': 'emotion_emoji/6_sad.png',
+    '吃惊': 'emotion_emoji/7_surprised.png',
+    'surprised': 'emotion_emoji/7_surprised.png'
+};
+
+function getEmotionEmoji(emotion) {
+    const normalized = String(emotion || '').trim().toLowerCase();
+    const chineseLabel = normalized.split('/')[0];
+    const englishLabel = normalized.split('/')[1];
+    return EMOTION_EMOJI_MAP[normalized]
+        || EMOTION_EMOJI_MAP[chineseLabel]
+        || EMOTION_EMOJI_MAP[englishLabel]
+        || EMOTION_EMOJI_MAP.other;
+}
+
+function setMobileSidebar(open) {
+    sidebar.classList.toggle('open', open);
+    mobileBackdrop.classList.toggle('open', open);
+}
+
+mobileMenuBtn.onclick = () => setMobileSidebar(true);
+mobileBackdrop.onclick = () => setMobileSidebar(false);
+
+function updateStatus(text, color='#64748b') {
+    statusText.innerText = text;
+    statusText.style.color = color;
+}
+
+function scrollBottom() {
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addMessage(type, text, audioUrl=null, emotion=null, createdAt=null) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `message ${type}`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerText = text; // 使用 innerText 防止 XSS
+
+    wrapper.appendChild(bubble);
+
+    if (audioUrl) {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.className = 'audio-player';
+        wrapper.appendChild(audio);
+        authFetch(audioUrl).then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.blob();
+        }).then(blob => {
+            audio.src = URL.createObjectURL(blob);
+        }).catch(error => console.error('音频加载失败', error));
+    }
+
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'time';
+    
+    // 如果没有传入真实时间（例如刚刚发语音本地占位），则生成一个当前本地时间兜底
+    let displayTime = createdAt;
+    if (!displayTime) {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        displayTime = `${hh}:${mm}`;
+    }
+    
+    timeDiv.appendChild(document.createTextNode(displayTime + ' '));
+
+    // ========== 渲染情绪标签 ==========
+    if (emotion && emotion !== '未知' && emotion !== '') {
+        const emotionTag = document.createElement('span');
+        emotionTag.className = 'emotion-tag';
+        emotionTag.title = `当前情绪：${emotion}`;
+
+        const emoji = document.createElement('img');
+        emoji.className = 'emotion-emoji';
+        emoji.src = getEmotionEmoji(emotion);
+        emoji.alt = `${emotion}表情`;
+        emoji.loading = 'lazy';
+
+        const label = document.createElement('span');
+        label.innerText = `当前情绪: ${emotion}`;
+        emotionTag.append(emoji, label);
+        timeDiv.appendChild(emotionTag);
+    }
+
+    wrapper.appendChild(timeDiv);
+
+    chatArea.appendChild(wrapper);
+    scrollBottom();
+}
+
+function addTyping() {
+    const typing = document.createElement('div');
+    typing.className = 'message ai';
+    typing.id = 'typingBox';
+    typing.innerHTML = `
+        <div class="bubble typing">
+            <span></span><span></span><span></span>
+        </div>
+    `;
+    chatArea.appendChild(typing);
+    scrollBottom();
+}
+
+function removeTyping() {
+    const typing = document.getElementById('typingBox');
+    if (typing) typing.remove();
+}
+
+
+async function initAudio() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: { sampleRate: 16000, channelCount: 1 }
+        });
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = e => {
+            if(e.data.size > 0) audioChunks.push(e.data);
+        }
+
+        mediaRecorder.onstop = async () => {
+            wave.style.display = 'none';
+            const duration = Date.now() - recordingStartedAt;
+            const chunks = audioChunks;
+            audioChunks = [];
+            recordingStartedAt = 0;
+            const mimeType = mediaRecorder.mimeType || chunks[0]?.type || 'audio/webm';
+            const blob = new Blob(chunks, {type: mimeType});
+
+            if (duration < MIN_RECORDING_DURATION_MS || blob.size === 0) {
+                updateStatus('录音时间太短', '#ef4444');
+                return;
+            }
+
+            // 本地先放一个临时的占位消息
+            addMessage('user', '🎤 发送语音中...');
+            await sendAudio(blob);
+        }
+    } catch(err) {
+        updateStatus('无法访问麦克风', '#ef4444');
+        console.error(err);
+    }
+}
+
+async function sendAudio(audioBlob) {
+    addTyping();
+    updateStatus('你的引航员正在倾听...');
+
+    const formData = new FormData();
+    formData.append('audio_file', audioBlob, 'audio.webm');
+    
+    if (currentSessionId) {
+        formData.append('session_id', currentSessionId);
+    }
+
+    try {
+        const response = await authFetch(CHAT_API_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        removeTyping();
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        // 必须先完整读取音频响应，避免 FRP/HTTP 连接阻塞后续历史请求。
+        const responseAudioBlob = await response.blob();
+
+        // 只保留 Session ID 的提取和更新
+        const newSessionId = response.headers.get('X-Session-ID');
+
+        if (newSessionId && !currentSessionId) {
+            currentSessionId = newSessionId;
+            await loadSessions();
+        }
+
+        // 让 loadHistory 全权负责界面的渲染，它会自动带上情绪标签
+        await loadHistory(currentSessionId);
+
+        // 播放音频
+        const currentAudio = new Audio(URL.createObjectURL(responseAudioBlob));
+        currentAudio.play();
+
+    } catch(err) {
+        removeTyping();
+        addMessage('ai', '❌ 抱歉，大脑网络短路了，请检查后端服务是否正常。');
+        updateStatus('请求失败', '#ef4444');
+        console.error(err);
+    }
+}
+
+async function loadSessions() {
+
+    try {
+
+        const res = await authFetch(HISTORY_SESSIONS_API_URL, {method: 'POST'});
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        sessionList.innerHTML = '';
+
+        const sessions = data.sessions || [];
+
+        if (sessions.length === 0) {
+
+            sessionList.innerHTML = `
+                <div style="padding:20px;color:#64748b">
+                    暂无历史会话
+                </div>
+            `;
+
+            return;
+        }
+
+        sessions.forEach(session => {
+
+            const item = document.createElement('div');
+
+            item.className = 'session-item';
+
+            // 提取原生标题
+            let rawTitle = session.last_user_message || '新的对话';
+            // 截断逻辑：超过5个字就截断加省略号
+            let displayTitle = rawTitle.length > 5 ? rawTitle.substring(0, 5) + '...' : rawTitle;
+
+            item.innerHTML = `
+
+                <div style="display:flex;gap:10px;align-items:flex-start">
+
+                    <input
+                        type="checkbox"
+                        class="session-checkbox"
+                        value="${session.session_id}"
+                    >
+
+                    <div style="flex:1">
+
+                        <div class="session-title">
+                            ${displayTitle}
+                        </div>
+
+                        <div class="session-time">
+                            ${session.timestamp || ''}
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+        item.onclick = (e) => {
+
+            // 点击 checkbox 时不切换会话
+            if (e.target.classList.contains('session-checkbox')) {
+                return;
+            }
+
+            selectSession(session.session_id, item);
+        };
+
+            sessionList.appendChild(item);
+        });
+
+    } catch(err) {
+
+        console.error(err);
+
+        sessionList.innerHTML = `
+            <div style="padding:20px;color:red">
+                会话加载失败
+            </div>
+        `;
+    }
+}
+async function selectSession(sessionId, element) {
+
+    currentSessionId = sessionId;
+
+    // active 高亮
+    if (currentActiveElement) {
+        currentActiveElement.classList.remove('active');
+    }
+
+    currentActiveElement = element;
+
+    element.classList.add('active');
+
+    await loadHistory(sessionId);
+    setMobileSidebar(false);
+}
+
+async function loadHistory(sessionId) {
+
+    try {
+
+        const formData = new FormData();
+
+        formData.append('session_id', sessionId);
+
+        const res = await authFetch(HISTORY_API_URL, {
+            method:'POST',
+            body:formData
+        });
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        chatArea.innerHTML = '';
+
+        const history = data.history || [];
+
+        if (history.length === 0) {
+
+            addMessage(
+                'ai',
+                '这是新的对话，你可以开始聊天。'
+            );
+
+            return;
+        }
+
+        history.forEach(msg => {
+
+            if (msg.role === 'system') return;
+
+            const type = msg.role === 'user'
+                ? 'user'
+                : 'ai';
+
+            const audioUrl = msg.audio_url
+                ? `${BASE_URL}${msg.audio_url}`
+                : null;
+                
+            const emotion = msg.emotion || null;
+            // 提取后端返回的真实时间
+            const createdAt = msg.created_at || null;
+            
+            // 传入第5个参数真实时间
+            addMessage(type, msg.content, audioUrl, emotion, createdAt);
+
+        });
+
+
+    } catch(err) {
+
+        console.error(err);
+
+        updateStatus('历史记录加载失败', '#ef4444');
+    }
+}
+function startRecord() {
+    if (!mediaRecorder || mediaRecorder.state === 'recording') return;
+    audioChunks = [];
+    recordingStartedAt = Date.now();
+    // 定期产生数据块，兼容部分浏览器在 stop 时无法正确输出完整数据的问题。
+    mediaRecorder.start(250);
+    recordBtn.classList.add('recording');
+    wave.style.display = 'flex';
+    updateStatus('正在倾听 (松开发送)...');
+}
+
+function stopRecord() {
+    if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+    mediaRecorder.stop();
+    recordBtn.classList.remove('recording');
+    updateStatus('正在处理音频...');
+}
+
+newChatBtn.onclick = () => {
+
+    currentSessionId = null;
+
+    if (currentActiveElement) {
+        currentActiveElement.classList.remove('active');
+    }
+
+    currentActiveElement = null;
+
+    chatArea.innerHTML = '';
+
+    addMessage(
+        'ai',
+        '你好，我一直都在。你可以开始新的对话。'
+    );
+
+    updateStatus('新的对话已创建', '#10b981');
+    setMobileSidebar(false);
+};
+
+const deleteBtn = document.getElementById('deleteBtn');
+
+deleteBtn.onclick = async () => {
+
+    const checkedBoxes = document.querySelectorAll(
+        '.session-checkbox:checked'
+    );
+
+    if (checkedBoxes.length === 0) {
+
+        alert('请先选择要删除的会话');
+
+        return;
+    }
+
+    const sessionIds = Array.from(checkedBoxes)
+        .map(box => box.value);
+
+    const confirmed = confirm(
+        `确认删除 ${sessionIds.length} 个会话？`
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        updateStatus('正在删除会话...');
+
+        const res = await authFetch(
+            DELETE_SESSIONS_API_URL,
+            {
+                method:'POST',
+
+                headers:{
+                    'Content-Type':'application/json'
+                },
+
+                body: JSON.stringify(sessionIds)
+            }
+        );
+
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+        }
+
+        // 如果当前会话被删
+        if (
+            currentSessionId &&
+            sessionIds.includes(currentSessionId)
+        ) {
+
+            currentSessionId = null;
+
+            chatArea.innerHTML = '';
+
+            addMessage(
+                'ai',
+                '你好，我一直都在。'
+            );
+        }
+
+        await loadSessions();
+
+        updateStatus(
+            '删除成功',
+            '#10b981'
+        );
+
+    } catch(err) {
+
+        console.error(err);
+
+        updateStatus(
+            '删除失败',
+            '#ef4444'
+        );
+    }
+};
+
+// Pointer Events 同时支持鼠标、触摸和触控笔，避免同一次操作重复触发。
+recordBtn.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    recordBtn.setPointerCapture(e.pointerId);
+    startRecord();
+});
+
+recordBtn.addEventListener('pointerup', e => {
+    e.preventDefault();
+    stopRecord();
+});
+
+recordBtn.addEventListener('pointercancel', stopRecord);
+
+['pointerdown', 'keydown', 'touchstart'].forEach(eventName => {
+    document.addEventListener(eventName, markUserActivity, {passive:true});
+});
+document.addEventListener('scroll', markUserActivity, {passive:true, capture:true});
+
+window.onload = async () => {
+    if (!accessToken) {
+        showLogin();
+        return;
+    }
+    try {
+        const response = await authFetch(`${BASE_URL}/auth/me`);
+        if (!response.ok) throw new Error('认证已过期');
+        const data = await response.json();
+        configureInactivityTimeout(data.expires_in);
+        await enterApp(data.user);
+    } catch (_) {
+        accessToken = null;
+        clearTimeout(inactivityTimer);
+        clearInterval(keepAliveTimer);
+        sessionStorage.removeItem('xiaoyi_access_token');
+        sessionStorage.removeItem('xiaoyi_inactivity_ms');
+        showLogin();
+    }
+};
+</script>
+
+</body>
+</html>

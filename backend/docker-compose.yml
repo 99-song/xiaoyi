@@ -1,0 +1,23 @@
+services:
+  asr:
+    image: backend:v1
+    container_name: backend
+    ports:
+      - "8003:8003"
+    volumes:
+      - .:/app/backend
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+    working_dir: /app/backend
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    # command: python main.py
+    command: tail -f /dev/null

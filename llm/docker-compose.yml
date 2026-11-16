@@ -1,0 +1,26 @@
+services:
+  llm:
+    image: llm:v1
+    container_name: llm
+    ports:
+      - "8005:8005"
+    volumes:
+      - ../model/Qwen3-1.7B:/app/model/Qwen3-1.7B
+      - .:/app/LLM
+      - ../backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/LLM
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    command: python server.py
+    # command: tail -f /dev/null

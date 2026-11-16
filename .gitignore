@@ -1,0 +1,13 @@
+logs/
+db_data/
+/model
+/__pycache__/
+*.log
+images/
+
+
+# 忽略项目中所有 __pycache__ 目录
+**/__pycache__/
+
+# 忽略所有缓存目录（如果你还想忽略其他名为 cache 的目录）
+**/cache/

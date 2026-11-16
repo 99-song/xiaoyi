@@ -1,0 +1,28 @@
+services:
+  asr:
+    image: asr:v1
+    container_name: asr
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../dataset/my_custom_temp/asr:/app/my_custom_temp
+      - .:/app/Qwen3-ASR
+      - ../model/Qwen3-ASR:/app/models/Qwen3-ASR
+      - ../model/Qwen3-ForcedAligner-0.6B:/app/models/Qwen3-ForcedAligner-0.6B
+      - ../backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/Qwen3-ASR
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    # command: tail -f /dev/null
+    command: python3 server.py

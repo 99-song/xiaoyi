@@ -1,0 +1,23 @@
+backend:
+  port: 8004
+
+api:
+  host: "10.21.22.54"
+
+asr:
+  port: 8000
+  path: "/transcribe"
+  language: "Chinese"
+
+llm:
+  port: 8001
+  path: "/chat"
+
+tts:
+  port: 8002
+  zero_shot_path: "/zero_shot"
+  instruct_path: "/instruct"
+
+emotion:
+  port: 8003
+  path: "/analyze"

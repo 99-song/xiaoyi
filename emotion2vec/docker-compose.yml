@@ -1,0 +1,28 @@
+services:
+  emotion:
+    image: emotion:v1
+    container_name: emotion
+    ports:
+      - "8003:8003"
+    volumes:
+      - .:/app/emotion2vec
+      - ../backend/db_data:/app/emotion2vec/db_data
+      - ../model/emotion2vec_base_finetuned:/app/emotion2vec/model/emotion2vec_base_finetuned
+      - ../backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/emotion2vec
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    command: python server.py
+    # command: tail -f /dev/null

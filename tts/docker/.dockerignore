@@ -1,0 +1,19 @@
+# .dockerignore
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+.ipynb_checkpoints
+# 绝对不要把模型打包进镜像！模型应该通过挂载 (volumes) 传进去
+model/
+models/
+asset/
+*.pth
+*.bin
+*.onnx
+*.safetensors
+# 忽略掉你本地的虚拟环境（如果有）
+venv/
+env/
+.conda/

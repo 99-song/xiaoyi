@@ -1,0 +1,23 @@
+services:
+  tts:
+    image: soar97/triton-cosyvoice:25.06
+    shm_size: '1gb'
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    volumes:
+      - ../../../tts:/workspace/CosyVoice
+      - ../../../model/CosyVoice3:/workspace/models/CosyVoice3
+    environment:
+      - PYTHONIOENCODING=utf-8
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    # 【核心改动 3：修改启动指令】由于代码已在本地，直接进入目录并从 Stage 1（编译引擎）开始执行
+    command: >
+      /bin/bash -c "cd /workspace/CosyVoice/runtime/triton_trtllm && bash run_cosyvoice3.sh 1 3"

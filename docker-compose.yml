@@ -1,0 +1,144 @@
+services:
+
+  frontend:
+    image: frontend:v1
+    container_name: frontend
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./frontend:/app/frontend:ro
+    working_dir: /app/frontend
+    command: python -m http.server 8009 --bind 0.0.0.0
+    restart: unless-stopped
+
+  backend:
+    image: backend:v1
+    container_name: backend
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./backend/db_data:/app/backend/db_data
+      - ./backend:/app/backend
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+    working_dir: /app/backend
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['7']
+              capabilities: [gpu]
+    command: python main.py
+
+  emotion:
+    image: emotion:v1
+    container_name: emotion
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./emotion2vec:/app/emotion2vec
+      - ./backend/db_data:/app/emotion2vec/db_data
+      - ./backend/config.yaml:/app/config/config.yaml:ro
+      - ./model/emotion2vec_plus_large:/app/emotion2vec/model/emotion2vec_plus_large
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/emotion2vec
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['7']
+              capabilities: [gpu]
+    command: python server.py
+
+  llm:
+    image: llm:v1
+    container_name: llm
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./model/Qwen3-1.7B:/app/model/Qwen3-1.7B
+      - ./llm:/app/LLM
+      - ./backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/LLM
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['7']
+              capabilities: [gpu]
+    command: python server.py
+    
+  tts:
+    image: tts:v1
+    container_name: tts
+    ports:
+      - "8002:8002"
+    volumes:
+      - ../dataset/my_custom_temp/tts:/app/my_custom_temp
+      - ./model/CosyVoice3:/workspace/models/CosyVoice3
+      - ./tts:/workspace/CosyVoice
+      - ./backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    stdin_open: true
+    tty: true
+    working_dir: /workspace/CosyVoice
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['7']
+              capabilities: [gpu]
+    command: python server.py
+
+  asr:
+    image: asr:v1
+    container_name: asr
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../dataset/my_custom_temp/asr:/app/my_custom_temp
+      - ./asr:/app/Qwen3-ASR
+      - ./model/Qwen3-ASR:/app/models/Qwen3-ASR
+      - ./model/Qwen3-ForcedAligner-0.6B:/app/models/Qwen3-ForcedAligner-0.6B
+      - ./backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - TZ=Asia/Shanghai
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    working_dir: /app/Qwen3-ASR
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['7']
+              capabilities: [gpu]
+    command: python server.py

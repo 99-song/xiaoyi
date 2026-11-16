@@ -1,0 +1,27 @@
+services:
+  tts:
+    image: tts:v1
+    container_name: tts
+    ports:
+      - "8001:8001"
+    volumes:
+      - ../../dataset/my_custom_temp/tts:/app/my_custom_temp
+      - ../model/CosyVoice3:/workspace/models/CosyVoice3
+      - .:/workspace/CosyVoice
+      - ../backend/config.yaml:/app/config/config.yaml:ro
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - PYTHONIOENCODING=utf-8
+      - XIAOYI_CONFIG_PATH=/app/config/config.yaml
+    stdin_open: true
+    tty: true
+    working_dir: /workspace/CosyVoice
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    
+    command: python3 /workspace/CosyVoice/server.py
