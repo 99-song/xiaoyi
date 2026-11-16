@@ -1,14 +1,5 @@
 # AI 心灵引航员
 
-官方 ModelScope 模型页面：
-
-- Qwen3-ASR：[1.7B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B)、[0.6B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-0.6B)（按实际部署版本选择）。
-- [Qwen3-ForcedAligner-0.6B](https://www.modelscope.cn/models/Qwen/Qwen3-ForcedAligner-0.6B)
-- [Qwen3-1.7B](https://www.modelscope.cn/models/Qwen/Qwen3-1.7B)
-- [Fun-CosyVoice3-0.5B-2512](https://www.modelscope.cn/models/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)
-- [emotion2vec_plus_large](https://www.modelscope.cn/models/iic/emotion2vec_plus_large)
-- [SenseVoiceSmall](https://www.modelscope.cn/models/iic/SenseVoiceSmall)（备用模型）
-
 ## 界面预览
 
 ![前端界面示例 1](sample/1.png)
@@ -226,12 +217,12 @@ docker save frontend:v1 backend:v1 emotion:v1 llm:v1 asr:v1 tts:v1 \
 
 ## 使用模型
 
-以下为本项目使用的模型的原始工作。
+以下为本项目使用的模型及其原始工作，模型名称后的链接指向官方 ModelScope 页面。
 
 
 | 模型                                | 论文                                                                                                                                     |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Qwen3-ASR、Qwen3-ForcedAligner-0.6B | Shi et al. (2026).[Qwen3-ASR Technical Report](https://arxiv.org/abs/2601.21337)                                                         |
-| Qwen3-1.7B                          | Qwen Team (2025).[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)                                                              |
-| CosyVoice3                          | Du et al. (2025).[CosyVoice 3: Towards In-the-wild Speech Generation via Scaling-up and Post-training](https://arxiv.org/abs/2505.17589) |
-| emotion2vec_plus_large              | Ma et al. (2023).[emotion2vec: Self-Supervised Pre-Training for Speech Emotion Representation](https://arxiv.org/abs/2312.15185)         |
+| Qwen3-ASR（[1.7B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-1.7B) / [0.6B](https://www.modelscope.cn/models/Qwen/Qwen3-ASR-0.6B)）、Qwen3-ForcedAligner-0.6B（[ModelScope](https://www.modelscope.cn/models/Qwen/Qwen3-ForcedAligner-0.6B)） | Shi et al. (2026). [Qwen3-ASR Technical Report](https://arxiv.org/abs/2601.21337) |
+| Qwen3-1.7B（[ModelScope](https://www.modelscope.cn/models/Qwen/Qwen3-1.7B)） | Qwen Team (2025). [Qwen3 Technical Report](https://arxiv.org/abs/2505.09388) |
+| CosyVoice3（[ModelScope](https://www.modelscope.cn/models/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)） | Du et al. (2025). [CosyVoice 3: Towards In-the-wild Speech Generation via Scaling-up and Post-training](https://arxiv.org/abs/2505.17589) |
+| emotion2vec_plus_large（[ModelScope](https://www.modelscope.cn/models/iic/emotion2vec_plus_large)） | Ma et al. (2023). [emotion2vec: Self-Supervised Pre-Training for Speech Emotion Representation](https://arxiv.org/abs/2312.15185) |
